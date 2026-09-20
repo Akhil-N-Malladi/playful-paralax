@@ -8,44 +8,49 @@
   const edgeLayer = document.getElementById('journey-edge-layer');
   const travelerLayer = document.getElementById('journey-travelers');
   const resetButton = document.getElementById('journey-reset');
+  const descriptor = document.getElementById('journey-descriptor');
+  const descriptorEra = document.getElementById('journey-descriptor-era');
+  const descriptorTitle = document.getElementById('journey-descriptor-title');
+  const descriptorText = document.getElementById('journey-descriptor-text');
   if (!map || !wrap || !svg || !edgeLayer || !travelerLayer) return;
 
   const ns = 'http://www.w3.org/2000/svg';
   const rows = 8;
   const milestones = [
-    {id:'club',cat:'math',col:0,row:0,era:'Grade 7',title:'Math competition club',section:'#math'},
-    {id:'amc8',cat:'math',col:0,row:1,era:'Grade 8',title:'AMC 8 · 17',section:'#math'},
-    {id:'amc10',cat:'math',col:0,row:2,era:'Grades 9-10',title:'AMC 10 · AIME qualifier',section:'#math'},
-    {id:'amc12',cat:'math',col:0,row:3,era:'Grade 11',title:'AMC 12 · 123',section:'#math',major:true},
-    {id:'aime',cat:'math',col:0,row:4,era:'Grade 11',title:'AIME · 8',section:'#math',major:true},
-    {id:'study',cat:'math',col:0,row:5,era:'Independent study',title:'Beyond the syllabus',section:'#math'},
-    {id:'sumac',cat:'math',col:0,row:6,era:'Summer study',title:'Stanford SUMaC',section:'#sumac-experience',stanford:true},
-    {id:'usamo',cat:'math',col:0,row:7,era:'Future goal',title:'USAMO qualification',section:'#math',future:true},
+    {id:'club',cat:'math',col:0,row:0,era:'Grade 7',title:'Math competition club',section:'#math',desc:'I was one of 25 students selected from about 300 for my middle school math competition club.'},
+    {id:'amc8',cat:'math',col:0,row:1,era:'Grade 8',title:'AMC 8 · 17',section:'#math',desc:'My first major competition result. I scored 17 on the AMC 8 and started building a stronger competition math foundation.'},
+    {id:'amc10',cat:'math',col:0,row:2,era:'Grades 9-10',title:'AMC 10 · AIME qualifier',section:'#math',desc:'I moved from a 75 on the AMC 10 in grade 9 to a 99 in grade 10 and qualified for AIME.'},
+    {id:'amc12',cat:'math',col:0,row:3,era:'Grade 11',title:'AMC 12 · 123',section:'#math',major:true,desc:'I scored 123 on the AMC 12. The result reflects several years of focused problem solving across algebra, geometry, counting, and number theory.'},
+    {id:'aime',cat:'math',col:0,row:4,era:'Grade 11',title:'AIME · 8',section:'#math',major:true,desc:'I scored 8 on AIME after qualifying through the AMC 12. I finished among the top 15 percent of AIME scorers.'},
+    {id:'study',cat:'math',col:0,row:5,era:'Independent study',title:'Beyond the syllabus',section:'#math',desc:'Outside school, I have studied multivariable calculus, discrete math, real analysis, linear algebra, and I am now learning abstract algebra.'},
+    {id:'sumac',cat:'math',col:0,row:6,era:'Summer study',title:'Stanford SUMaC · Track 1',section:'#sumac-experience',stanford:true,desc:'I was accepted to Stanford SUMaC Track 1, focused on abstract algebra and proof-based mathematics.'},
+    {id:'usamo',cat:'math',col:0,row:7,era:'Future goal',title:'USAMO qualification',section:'#math',future:true,desc:'USAMO qualification is a future goal. It is not listed as a completed achievement.'},
 
-    {id:'java',cat:'code',col:1,row:1,era:'Grade 9',title:'Learning Java',section:'#cs'},
-    {id:'python',cat:'code',col:1,row:2,era:'Grade 10',title:'Java to Python',section:'#cs'},
-    {id:'weather',cat:'code',col:1,row:3,era:'Project',title:'Severe weather AI',section:'#weather-project'},
-    {id:'cac',cat:'code',col:1,row:4,era:'App challenge',title:'Congressional App Challenge',section:'#weather-project',major:true},
-    {id:'scrape',cat:'code',col:1,row:5,era:'After grade 10',title:'Small research tools',section:'#cs'},
-    {id:'usaco',cat:'code',col:1,row:6,era:'Algorithms',title:'USACO Silver',section:'#cs'},
+    {id:'java',cat:'code',col:1,row:1,era:'Grade 9',title:'Learning Java',section:'#cs',desc:'I learned Java in CSI at school, where I first built a foundation in programming and algorithmic problem solving.'},
+    {id:'python',cat:'code',col:1,row:2,era:'Grade 10',title:'Java to Python',section:'#cs',desc:'I moved from Java into Python so I could build machine learning, automation, web scraping, and mathematical modeling projects.'},
+    {id:'ai',cat:'code',col:1,row:3,era:'Presidential AI Challenge',title:'Presidential AI Challenge',section:'#weather-project',desc:'I participated in the Presidential AI Challenge with my severe weather prediction project. I later submitted the same project to the Congressional App Challenge.'},
+    {id:'weather',cat:'code',col:1,row:4,era:'Project',title:'Severe weather prediction',section:'#weather-project',desc:'I built a severe weather prediction project that combined code, machine learning, and real weather data into a usable web experience.'},
+    {id:'cac',cat:'code',col:1,row:5,era:'App challenge',title:'Congressional App Challenge',section:'#weather-project',major:true,desc:'I submitted the severe weather project to the Congressional App Challenge and turned it into an interactive web app for exploring weather risk.'},
+    {id:'scrape',cat:'code',col:1,row:6,era:'Applied at school',title:'School data automation',section:'#cs',desc:'I built a grade scraper that collects school grade data, sends it to Google Sheets, and runs regression and other calculations so I can analyze performance without repetitive manual work.'},
+    {id:'usaco',cat:'code',col:1,row:7,era:'Algorithms',title:'USACO Silver',section:'#cs',desc:'I reached USACO Silver, using Java and algorithmic problem solving to work through timed programming problems.'},
 
-    {id:'unt',cat:'research',col:2,row:3,era:'Research',title:'University of North Texas',section:'#unt-experience'},
-    {id:'papers',cat:'research',col:2,row:4,era:'Research',title:'Dataset, analysis, action',section:'#research'},
-    {id:'txsef',cat:'research',col:2,row:5,era:'Texas science fair',title:'TXSEF · 1st place',section:'#research',major:true},
-    {id:'upenn',cat:'research',col:2,row:6,era:'Research',title:'UPenn · Game theory',section:'#upenn-experience'},
+    {id:'unt',cat:'research',col:2,row:3,era:'Research internship',title:'University of North Texas',section:'#unt-experience',desc:'I worked on machine learning and biology research at UNT, including a cross-country study of factors that affect infectious disease outbreak spread.'},
+    {id:'papers',cat:'research',col:2,row:4,era:'Computational epidemiology',title:'Dataset, analysis, action',section:'#research',desc:'The work is being published as three papers across Q2 journals: one documents the dataset, one analyzes disease spread with machine learning, and one develops public-action recommendations from the findings.'},
+    {id:'txsef',cat:'research',col:2,row:5,era:'Texas science fair',title:'TXSEF · 1st place',section:'#research',major:true,desc:'My computational epidemiology research won 1st place in its category at the Texas Science and Engineering Fair.'},
+    {id:'upenn',cat:'research',col:2,row:6,era:'Research',title:'UPenn · Game theory research',section:'#upenn-experience',desc:'I worked on game theory research through the University of Pennsylvania, connecting mathematical reasoning with strategic decision making.'},
 
-    {id:'deca10',cat:'markets',col:3,row:2,era:'Grade 10',title:'DECA · 33 / 1,700+',section:'#finance'},
-    {id:'deca11',cat:'markets',col:3,row:3,era:'Grade 11',title:'DECA · 12 / 1,600+',section:'#finance'},
-    {id:'icdc',cat:'markets',col:3,row:4,era:'International',title:'DECA ICDC · 14 / 100',section:'#finance',major:true},
-    {id:'wharton',cat:'markets',col:3,row:5,era:'Wharton Global Youth',title:'Semifinalist',section:'#wharton-experience',major:true},
-    {id:'quant',cat:'markets',col:3,row:6,era:'Current work',title:'Healthcare quant pipeline',section:'#finance'}
+    {id:'deca10',cat:'markets',col:3,row:2,era:'Grade 10',title:'DECA · 33 / 1,700+',section:'#finance',desc:'In my first DECA Stock Market Game season, my team finished 33rd out of more than 1,700 teams.'},
+    {id:'deca11',cat:'markets',col:3,row:3,era:'Grade 11',title:'DECA · 12 / 1,600+',section:'#finance',desc:'The next season, my team finished 12th out of more than 1,600 teams and qualified for ICDC.'},
+    {id:'icdc',cat:'markets',col:3,row:4,era:'International',title:'DECA ICDC · 14 / 100',section:'#finance',major:true,desc:'At ICDC, my team finished 14th out of 100 teams in the Stock Market Game.'},
+    {id:'wharton',cat:'markets',col:3,row:5,era:'Wharton Global Youth',title:'Wharton semifinalist',section:'#wharton-experience',major:true,desc:'As team leader and quantitative lead, I set investment guidelines, built research and risk models, consolidated team findings, and helped turn the case into a coherent portfolio strategy.'},
+    {id:'quant',cat:'markets',col:3,row:6,era:'Current work',title:'Healthcare quant pipeline',section:'#finance',desc:'I am building a quantitative research pipeline for healthcare, biomedical, and pharmaceutical stocks, combining multiple signals to study long-term market inefficiencies.'}
   ];
 
   const edges = [
     ['club','amc8'],['amc8','amc10'],['amc10','amc12'],['amc12','aime'],
     ['amc12','study'],['amc12','sumac'],['aime','sumac'],['amc12','usamo'],
-    ['java','python'],['python','weather'],['weather','cac'],['java','scrape'],
-    ['java','usaco'],['amc12','usaco'],['amc10','unt'],['weather','unt'],
+    ['java','python'],['python','ai'],['ai','weather'],['ai','cac'],['weather','cac'],
+    ['java','scrape'],['java','usaco'],['amc12','usaco'],['amc10','unt'],['weather','unt'],
     ['unt','papers'],['papers','txsef'],['unt','upenn'],['amc12','upenn'],
     ['deca10','deca11'],['deca11','icdc'],['deca11','wharton'],['scrape','wharton'],
     ['amc12','wharton'],['wharton','quant'],['scrape','quant'],['papers','quant'],['upenn','quant']
@@ -194,9 +199,18 @@
     },delay);
   }
 
+  function updateDescriptor(node){
+    if(!descriptor || !descriptorEra || !descriptorTitle || !descriptorText || !node)return;
+    descriptorEra.textContent=node.era;
+    descriptorTitle.textContent=node.title;
+    descriptorText.textContent=node.desc;
+    descriptor.classList.add('has-selection');
+  }
+
   function selectNode(id,animate=true){
     stopTravelers();
     selectedId=id;
+    updateDescriptor(byId.get(id));
     const linked=connectedIds(id);
     milestones.forEach(node=>{
       const isSelected=node.id===id;
@@ -237,6 +251,12 @@
       node.el.setAttribute('aria-pressed','false');
     });
     edgeObjects.forEach(edge=>edge.path.classList.remove('active','dim'));
+    if(descriptor && descriptorEra && descriptorTitle && descriptorText){
+      descriptorEra.textContent='Select a milestone';
+      descriptorTitle.textContent='A little more context';
+      descriptorText.textContent='Click any node to see what it meant, what I built or learned, and how it connects to the next step.';
+      descriptor.classList.remove('has-selection');
+    }
   }
 
   resetButton?.addEventListener('click',reset);

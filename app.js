@@ -43,11 +43,11 @@ const line = equity.map((value,i)=>`${i?'L':'M'}${px(i).toFixed(1)},${py(value).
 $('equity-line').setAttribute('d',line);$('equity-area').setAttribute('d',`${line} L975,300 L50,300 Z`);
 [0,15,30,47,60].forEach(day=>svgElement('circle',{cx:px(day),cy:py(equity[day]),r:5,class:'trade-marker'},$('trade-markers')));
 const sampleEvents = [
-  [0,'Build a position','An illustrative entry before a favorable move. Actual trades have not been supplied.'],
+  [0,'Build a position','An illustrative entry before a favorable move. This example does not use my actual trades.'],
   [12,'Add into strength','A sample increase in exposure as the synthetic portfolio rises.'],
   [26,'Manage the drawdown','An illustrative pullback shows the risk that accompanies an aggressive strategy.'],
   [42,'Take some profit','A sample exit after a rally illustrates timing decisions.'],
-  [56,'Finish the season','The illustration ends at 214, representing the supplied 114% portfolio growth.']
+  [56,'Finish the season','The illustration ends at 214 to represent the 114% portfolio growth.']
 ];
 function updateTrade(day) {
   day=Math.max(0,Math.min(60,Math.round(day)));$('trade-range').value=String(day);

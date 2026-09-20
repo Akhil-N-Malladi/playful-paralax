@@ -1,10 +1,11 @@
-# Akhil — connected portfolio
+# Akhil - connected portfolio
 
-Open index.html directly, or serve this folder with `python -m http.server 8000`.
-Upload the folder contents to your existing static host. No build step is required.
+Open `index.html` directly, or serve this folder with `python -m http.server 8000`. Upload the folder contents to your existing static host. No build step is required.
 
-Includes the original scroll-driven geometry, terminal and market backgrounds, a new animated parametric knot, five featured achievements, a 23-milestone interactive journey map, the supplied CAC screenshot and seven local book cover images. Gradient descent and the competition timeline have been removed. Dark mode, reduced motion and the existing probability, Markov and Monte Carlo interactions remain.
+This version removes the rotating hero graphic and uses a quieter card system with flat surfaces. It keeps the scroll-driven math, terminal, and market backgrounds, with extra blur in the finance section.
 
-Journey connections represent thematic development, not verified admissions causality. USAMO is explicitly a future goal. Existing achievements are carried over from the supplied website and user instructions. The sketch's grade-9 AMC 10 score of 72 is used. The map omits the conflicting math club selection count.
+The journey section now uses a 23-milestone radial graph. Earlier milestones sit near the center, later milestones branch outward, and category colors replace column grouping. Nodes respond to pointer movement, support dragging, trace connected paths with a glowing traveler, and reveal a button that jumps to the related page section. AMC 12 and AIME both connect directly to Stanford SUMaC.
 
-Book cover sources: Open Library (AoPS Volume 1, Intermediate Algebra, Rudin, Lay); Rainbow Resource / Cloudinary (Intermediate Counting & Probability); supplied eBay product image (AoPS Volume 2); stewartcalculus.com (Calculus). All images are included locally.
+The lost boarding pass interaction now matches the problem shown on the page. Its explanation stays hidden until the user reveals the result. The Congressional App Challenge card requests a live screenshot and falls back to a local preview if the screenshot service fails.
+
+Dark mode and reduced-motion support remain. USAMO is marked as a future goal.

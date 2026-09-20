@@ -103,41 +103,46 @@ function updateBookCover(index){
 }
 updateBookCover(0);
 
-// Bertrand's box paradox -----------------------------------------------
+// Lost boarding pass paradox -------------------------------------------
 const paradoxButtons=Array.from(document.querySelectorAll('[data-paradox-answer]'));
 let paradoxChoice=null;
 function formatParadoxChoice(value){
   if(Math.abs(value-.5)<.01)return '1 / 2';
   if(Math.abs(value-1/3)<.01)return '1 / 3';
-  return '2 / 3';
+  return '1 / 100';
 }
 function chooseParadoxAnswer(value,button){
   paradoxChoice=Number(value);
   paradoxButtons.forEach(b=>b.classList.toggle('selected',b===button));
-  $('paradox-status').textContent=`You chose ${formatParadoxChoice(paradoxChoice)}. Now test the intuition.`;
+  $('paradox-status').textContent=`You chose ${formatParadoxChoice(paradoxChoice)}. Run the experiment to check it.`;
   $('paradox-run').disabled=false;
   $('paradox-result').hidden=true;
+  const explanation=$('paradox-explanation'); if(explanation)explanation.hidden=true;
 }
-function simulateBertrand(validObservations=1000){
-  const cards=[['G','G'],['S','S'],['G','S']];
-  let seenGold=0,hiddenGold=0,draws=0;
-  while(seenGold<validObservations){
-    const card=cards[Math.floor(Math.random()*cards.length)];
-    const side=Math.random()<.5?0:1;
-    draws++;
-    if(card[side]!=='G')continue;
-    seenGold++;
-    if(card[1-side]==='G')hiddenGold++;
+function passenger100GetsSeat(passengers=100){
+  const occupied=Array(passengers).fill(false);
+  let choice=Math.floor(Math.random()*passengers);
+  occupied[choice]=true;
+  for(let passenger=1;passenger<passengers-1;passenger++){
+    if(!occupied[passenger]){occupied[passenger]=true;continue;}
+    const open=[];
+    for(let seat=0;seat<passengers;seat++)if(!occupied[seat])open.push(seat);
+    choice=open[Math.floor(Math.random()*open.length)];
+    occupied[choice]=true;
   }
-  return {hiddenGold,seenGold,draws};
+  return !occupied[passengers-1];
 }
 paradoxButtons.forEach(button=>button.addEventListener('click',()=>chooseParadoxAnswer(button.dataset.paradoxAnswer,button)));
 $('paradox-run')?.addEventListener('click',()=>{
   if(paradoxChoice===null)return;
-  const r=simulateBertrand(1000),pct=r.hiddenGold/r.seenGold*100;
-  const correct=Math.abs(paradoxChoice-2/3)<.01;
+  const trials=1000;
+  let wins=0;
+  for(let i=0;i<trials;i++)if(passenger100GetsSeat())wins++;
+  const pct=wins/trials*100;
+  const correct=Math.abs(paradoxChoice-.5)<.01;
   $('paradox-result').hidden=false;
-  $('paradox-result').innerHTML=`<strong>The answer is 2 / 3.</strong> Your instinct was ${formatParadoxChoice(paradoxChoice)}. In this run, ${r.hiddenGold.toLocaleString()} of ${r.seenGold.toLocaleString()} gold-face observations had gold hidden on the back (${pct.toFixed(1)}%). ${correct?'Your first guess matched the result.':'The 1 / 2 instinct is tempting because two cards can show gold, but the gold-gold card can present a gold face in two different ways.'}`;
+  $('paradox-result').innerHTML=`<strong>The answer is 1 / 2.</strong> Passenger 100 kept Seat 100 in ${wins.toLocaleString()} of ${trials.toLocaleString()} trials (${pct.toFixed(1)}%). ${correct?'Your guess matched the result.':'The random chain treats Seat 1 and Seat 100 symmetrically.'}`;
+  const explanation=$('paradox-explanation'); if(explanation)explanation.hidden=false;
 });
 $('paradox-reset')?.addEventListener('click',()=>{
   paradoxChoice=null;
@@ -145,6 +150,7 @@ $('paradox-reset')?.addEventListener('click',()=>{
   $('paradox-status').textContent='Pick the answer that seems most intuitive.';
   $('paradox-run').disabled=true;
   $('paradox-result').hidden=true;
+  const explanation=$('paradox-explanation'); if(explanation){explanation.hidden=true;explanation.open=false;}
 });
 
 // Four-state Markov chain --------------------------------------------

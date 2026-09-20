@@ -24,7 +24,7 @@ body,.site-header,.chapter,.hero,.book,.portrait,.market-panel,.sim-panel,.proje
 .paradox-card small{font:10px 'Courier New',monospace;text-transform:uppercase;letter-spacing:.04em}
 .paradox-card.gold{background:#e7d59c}
 .paradox-card.silver{background:#d9d9d2}
-.paradox-card.split{background:linear-gradient(90deg,#e7d59c 0 50%,#d9d9d2 50%)}
+.paradox-card.split{background:#e2d7b7}
 .paradox-question{margin:0 0 14px;color:#55554e;font-size:.94rem}
 .paradox-options{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
 .paradox-options button{background:transparent;border:1px solid #171714;padding:12px 8px;font:700 15px 'Courier New',monospace;transition:transform .28s cubic-bezier(.16,1,.3,1),background .2s,color .2s}
@@ -87,7 +87,7 @@ html[data-theme="dark"] .book-cover-stage img{box-shadow:4px 5px 0 var(--shadow)
 .book-cover-stage img{height:250px;width:auto;max-width:44%;object-fit:contain;border:1px solid #171714;box-shadow:7px 9px 0 #c4c4b8;transition:transform .35s cubic-bezier(.2,.75,.2,1),box-shadow .35s ease}
 .book-cover-stage img:only-child{height:270px;max-width:72%}
 .book-cover-stage img:hover{transform:translateY(-7px) rotate(-1deg);box-shadow:10px 14px 0 #c4c4b8}
-.book-cover-fallback{height:250px;aspect-ratio:2/3;max-width:72%;border:1px solid #171714;box-shadow:7px 9px 0 #c4c4b8;padding:18px;display:flex;flex-direction:column;justify-content:space-between;background:linear-gradient(145deg,#d7d9c9,#f0efe8);color:#171714}
+.book-cover-fallback{height:250px;aspect-ratio:2/3;max-width:72%;border:1px solid #171714;box-shadow:7px 9px 0 #c4c4b8;padding:18px;display:flex;flex-direction:column;justify-content:space-between;background:#e6e7dc;color:#171714}
 .book-cover-fallback>span,.book-cover-fallback>small{font:10px 'Courier New',monospace;text-transform:uppercase;letter-spacing:.05em}
 .book-cover-fallback strong{font-size:1.25rem;line-height:1.05;letter-spacing:-.045em}
 
@@ -107,7 +107,7 @@ html[data-theme="dark"] .book-cover-stage img{box-shadow:4px 5px 0 var(--shadow)
 html[data-theme="dark"] .book-cover-stage{background:var(--surface-2)!important}
 html[data-theme="dark"] .book-cover-stage img{box-shadow:7px 9px 0 var(--shadow)}
 html[data-theme="dark"] .book-cover-stage img:hover{box-shadow:10px 14px 0 var(--shadow)}
-html[data-theme="dark"] .book-cover-fallback{background:linear-gradient(145deg,#23271f,#171915);color:var(--ink);box-shadow:7px 9px 0 var(--shadow)}
+html[data-theme="dark"] .book-cover-fallback{background:#20231d;color:var(--ink);box-shadow:7px 9px 0 var(--shadow)}
 html[data-theme="dark"] .experience-list .experience-featured:after{color:rgba(242,242,234,.045)}
 html[data-theme="dark"] .experience-list .experience-featured.stanford:hover{background:#7d1f2e!important;color:#fff4f5!important;border-color:#b83b4f!important;box-shadow:none!important}html[data-theme="dark"] .experience-list .experience-featured.upenn:hover{background:#1e3f8f!important;color:#f3f6ff!important;border-color:#3f6fd5!important;box-shadow:none!important}
 html[data-theme="dark"] .experience-list .experience-featured.stanford:hover :is(.eyebrow,p,.experience-label,h3,.school-name){color:#ffe9ec!important}
@@ -124,7 +124,12 @@ html[data-theme="dark"] .book:hover:not(.selected),html[data-theme="dark"] .book
 
 html[data-theme="dark"] .paradox-card.gold{background:#5a4d28!important;color:#f3ead0}
 html[data-theme="dark"] .paradox-card.silver{background:#373a36!important;color:var(--ink)}
-html[data-theme="dark"] .paradox-card.split{background:linear-gradient(90deg,#5a4d28 0 50%,#373a36 50%)!important;color:var(--ink)}
+html[data-theme="dark"] .paradox-card.split{background:#46422f!important;color:var(--ink)}
 .book-cover-fallback-image{height:250px;width:auto;max-width:72%;object-fit:contain;border:1px solid #171714;box-shadow:7px 9px 0 #c4c4b8}
 html[data-theme="dark"] .book-cover-fallback-image{filter:brightness(.82) contrast(1.05);box-shadow:7px 9px 0 var(--shadow)}
 @media(max-width:700px){.book-cover-fallback-image{height:225px}}
+
+/* Lost boarding pass problem */
+.probability-game{grid-template-columns:minmax(0,.95fr) minmax(0,1.15fr);gap:44px;padding:34px;background:var(--card)!important;align-items:start}
+.probability-intro h3{font-size:clamp(2.25rem,4vw,4.2rem);line-height:1.02;margin:15px 0 20px;max-width:10ch}.probability-intro p{font-size:.95rem;line-height:1.72;max-width:46ch}.probability-play{border-left:1px solid var(--line);padding-left:34px}.boarding-visual{border:1px solid var(--line);background:var(--surface);padding:18px;margin:15px 0 20px;display:grid;gap:15px}.boarding-pass-mark{display:flex;justify-content:space-between;align-items:end;border-bottom:1px solid var(--line);padding-bottom:10px}.boarding-pass-mark span{font:700 2.4rem/1 'Courier New',monospace;letter-spacing:-.07em;color:var(--accent)}.boarding-pass-mark small{font:10px 'Courier New',monospace;text-transform:uppercase;letter-spacing:.07em;color:var(--muted)}.seat-chain{display:grid;grid-template-columns:44px 44px 1fr 44px 52px;gap:8px;align-items:center}.seat-dot{display:grid;place-items:center;height:44px;border:1px solid var(--line);background:var(--card);font:700 12px 'Courier New',monospace}.seat-dot.key{border-color:var(--accent);color:var(--accent)}.seat-gap{text-align:center;color:var(--muted);letter-spacing:.3em}.boarding-arrow{font:11px/1.5 'Courier New',monospace;color:var(--muted)}.paradox-question{font-weight:600;color:var(--ink)!important;margin-bottom:13px}.paradox-options button{background:var(--card);border-color:var(--line);border-radius:6px!important;min-height:46px}.paradox-options button:hover{border-color:var(--ink);transform:none}.paradox-options button.selected{background:var(--ink);color:var(--bg);transform:none}.monty-actions{grid-template-columns:1.2fr .8fr}.probability-play details{margin-top:18px}.probability-play summary{font-weight:600}.monty-batch-result{background:var(--surface)!important;border-left:3px solid var(--accent)}
+@media(max-width:760px){.probability-game{grid-template-columns:1fr;gap:24px;padding:22px}.probability-play{border-left:0;border-top:1px solid var(--line);padding:22px 0 0}.seat-chain{grid-template-columns:38px 38px 1fr 38px 46px}.seat-dot{height:38px}.boarding-arrow{font-size:9px}}

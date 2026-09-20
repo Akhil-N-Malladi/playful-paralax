@@ -1,0 +1,18 @@
+# Akhil Malladi
+
+> Personal portfolio for Akhil Malladi, a high school student working across mathematics, computer science, computational epidemiology research, and quantitative finance.
+
+Canonical URL: https://akhil-malladi-paralax-portfolio.onrender.com/
+
+## Main sections
+- Mathematics: competition math, AMC 12, AIME, Stanford SUMaC Track 1, advanced coursework and books.
+- Computer science: Java, Python, USACO Silver, school data automation, severe weather prediction, Presidential AI Challenge, Congressional App Challenge.
+- Research: University of North Texas computational epidemiology work, three papers in the publication process, TXSEF 1st place, UPenn game theory research.
+- Finance: DECA Stock Market Game, ICDC 14/100, Wharton Global Youth semifinalist, quantitative models including Markov chains, hidden Markov models, Monte Carlo, Granger analysis and XGBoost.
+- Academics: GPA, SAT, class rank, AP coursework and advanced mathematics study.
+
+## Featured project
+- Severe weather prediction website: https://severe-weather-prediction-website.onrender.com/WeatherProject.html
+
+## Crawl guidance
+The public portfolio and its static assets may be crawled. The canonical page is the root URL above.

@@ -1,0 +1,431 @@
+/* Parallax narrative variant v2. Current foreground layout and competition timeline remain unchanged. */
+:root{
+  --site-header-height:84px;
+  --px-ink:#171714;
+  --px-paper:#ece6d8;
+  --px-paper-line:rgba(75,105,132,.12);
+  --px-paper-margin:rgba(177,76,62,.16);
+  --px-accent:#f34c28;
+}
+
+html{background:#ece6d8}
+body{
+  overflow-x:hidden;
+  background-color:var(--px-paper);
+  background-image:
+    linear-gradient(90deg, transparent 0 11.5%, var(--px-paper-margin) 11.5% 11.65%, transparent 11.65%),
+    repeating-linear-gradient(0deg, transparent 0 30px, var(--px-paper-line) 30px 31px),
+    radial-gradient(circle at 20% 12%, rgba(255,255,255,.2), transparent 38%),
+    linear-gradient(#eee9dc,#e8e1d2);
+  background-attachment:fixed;
+  transition:none;
+}
+.site-header{backdrop-filter:none}
+.hero{background:transparent}
+.chapter{position:relative;isolation:isolate}
+.chapter.parallax-active{background:transparent}
+.parallax-layer{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:0}
+/*
+   Frosting fix
+   -------------
+   The old version relied only on backdrop-filter on the chapter pseudo-element.
+   Because the animated backgrounds live inside their own sticky/positioned layer,
+   some browsers composite them separately and the backdrop blur can appear to do
+   nothing. The visible background panels are now blurred directly, with the
+   translucent chapter tint kept above them for the frosted-glass wash.
+
+   Change these three variables to control the ACTUAL blur strength.
+*/
+:root{
+  --math-frost-blur:6px;
+  --cs-frost-blur:7px;
+  --finance-frost-blur:8px;
+}
+
+.chapter.parallax-active::after{
+  content:'';
+  position:absolute;
+  inset:0;
+  z-index:1;
+  pointer-events:none;
+  background:rgba(244,240,229,.14);
+}
+#cs.chapter.parallax-active::after{background:rgba(3,7,4,.38)}
+#finance.chapter.parallax-active::after{background:rgba(235,240,233,.34)}
+.chapter>*:not(.parallax-layer):not(.parallax-divider),.hero>*{position:relative;z-index:2}
+
+/* Direct blur fallback: this is what makes the frost visible reliably. */
+.journal-sheet{
+  filter:blur(var(--math-frost-blur)) saturate(.82);
+  transform:scale(1.018);
+  transform-origin:center center;
+}
+.terminal-screen{
+  filter:blur(var(--cs-frost-blur)) saturate(.72);
+  transform:scale(1.018);
+  transform-origin:center center;
+}
+.jnj-board{
+  filter:blur(var(--finance-frost-blur)) saturate(.78);
+  transform:scale(1.018);
+  transform-origin:center center;
+}
+
+
+/* ------------------------------------------------------------------
+   MATH: stationary journal paper with scroll-constructed AIME diagram.
+------------------------------------------------------------------ */
+#math{background:transparent}
+.math-parallax{overflow:visible}
+.journal-sheet{
+  position:sticky;
+  top:var(--site-header-height);
+  height:calc(100vh - var(--site-header-height));
+  min-height:620px;
+  background-color:#ece6d8;
+  background-image:
+    linear-gradient(90deg, transparent 0 12%, rgba(179,71,58,.17) 12% 12.15%, transparent 12.15%),
+    repeating-linear-gradient(0deg, transparent 0 29px, rgba(67,98,126,.13) 29px 30px),
+    radial-gradient(circle at 72% 28%, rgba(255,255,255,.55), transparent 36%);
+  border-bottom:1px solid rgba(23,23,20,.12)
+}
+.journal-sheet:after{
+  content:'';
+  position:absolute;
+  inset:0;
+  background:linear-gradient(90deg,rgba(52,42,30,.035),transparent 8%,transparent 92%,rgba(52,42,30,.025));
+  mix-blend-mode:multiply
+}
+.journal-meta{
+  position:absolute;
+  right:4%;top:28px;
+  font:11px 'Courier New',monospace;
+  text-transform:uppercase;
+  letter-spacing:.1em;
+  color:rgba(23,23,20,.42)
+}
+.aime-geometry{
+  position:absolute;
+  right:-2%;
+  top:3%;
+  width:min(72vw,920px);
+  height:92%;
+  opacity:.52;
+  overflow:visible;
+  filter:drop-shadow(0 1px 0 rgba(255,255,255,.35))
+}
+.geo-ink{fill:none;stroke:#20241f;stroke-width:2.05;stroke-linecap:round;stroke-linejoin:round}
+.geo-draw{
+  stroke-dasharray:1;
+  stroke-dashoffset:calc(1 - var(--draw,0));
+  vector-effect:non-scaling-stroke
+}
+.circle-main{stroke:#313831;stroke-width:1.65}
+.circle-third{stroke:#9c4a36;stroke-width:2.15}
+.tangent{stroke:#171714;stroke-width:2.4}
+.radical-axis{stroke:#5a665e;stroke-width:1.45;stroke-dasharray:1;opacity:.72}
+.chord-line{stroke:#9c4a36;stroke-width:1.75}
+.construction{stroke:#343d37;stroke-width:1.45;stroke-dasharray:1}
+.midpoint-mark{stroke:#9c4a36;stroke-width:2}
+.geo-point{opacity:var(--draw,0);transition:opacity .08s linear}
+.geo-point circle{fill:#20241f;stroke:none}
+.geo-point text,.geo-label{
+  fill:#20241f;
+  stroke:none;
+  font:italic 20px Georgia,serif;
+  opacity:var(--draw,0)
+}
+.geo-label{font-size:18px}
+.line-label{font-size:21px}
+.accent-point circle{fill:#9c4a36}
+.accent-point text{fill:#8d402f}
+.journal-note{
+  position:absolute;
+  font:italic 15px Georgia,serif;
+  color:rgba(92,58,39,.56);
+  transform:rotate(-4deg)
+}
+.note-one{right:9%;bottom:12%}
+.note-two{right:32%;bottom:7%;transform:rotate(2deg)}
+
+/* Keep foreground blocks readable while letting paper show through. */
+#math .books-layout,#math .probability-game,#math .timeline-node,#math .knowledge{
+  backdrop-filter:blur(1.5px)
+}
+#math .timeline-tree{position:relative;z-index:2}
+
+/* ------------------------------------------------------------------
+   CS: terminal background. Foreground content remains current layout.
+------------------------------------------------------------------ */
+#cs{background:#050806;color:#eef5ed}
+.cs-parallax{background:#050806}
+.cs-parallax:before{
+  content:'';
+  position:absolute;inset:0;
+  background:
+    radial-gradient(circle at 75% 30%,rgba(50,255,133,.055),transparent 32%),
+    repeating-linear-gradient(0deg,rgba(255,255,255,.018) 0 1px,transparent 1px 4px);
+  opacity:.9
+}
+.terminal-screen{
+  position:sticky;
+  top:var(--site-header-height);
+  height:calc(100vh - var(--site-header-height));
+  min-height:620px;
+  padding:5.5vh 4vw 5vh 36%;
+  color:#9df4ae;
+  font-family:'Courier New',monospace
+}
+.terminal-bar{
+  height:42px;
+  border:1px solid rgba(152,244,173,.24);
+  border-bottom:0;
+  background:#0b110c;
+  display:grid;
+  grid-template-columns:1fr 2fr 1fr;
+  align-items:center;
+  padding:0 14px;
+  font-size:10px;
+  color:#6d9c76;
+  text-transform:uppercase;
+  letter-spacing:.07em
+}
+.terminal-bar>span:nth-child(2){text-align:center}
+.terminal-bar>span:last-child{text-align:right}
+.terminal-dots{display:flex;gap:6px}
+.terminal-dots i{display:block;width:8px;height:8px;border-radius:50%;background:#243a29}
+.terminal-dots i:first-child{background:#e66952}
+.terminal-dots i:nth-child(2){background:#d6b04a}
+.terminal-dots i:nth-child(3){background:#68b773}
+.terminal-body{
+  height:calc(100% - 78px);
+  border:1px solid rgba(152,244,173,.24);
+  display:grid;
+  grid-template-columns:42px 1fr;
+  background:rgba(4,9,5,.94);
+  box-shadow:0 36px 100px rgba(0,0,0,.35)
+}
+.terminal-gutter{
+  padding:18px 10px;
+  border-right:1px solid rgba(152,244,173,.12);
+  color:#31563a;
+  font:11px/1.72 'Courier New',monospace;
+  text-align:right;
+  user-select:none
+}
+.terminal-body pre{
+  margin:0;
+  padding:18px 22px;
+  white-space:pre-wrap;
+  font:13px/1.72 'Courier New',monospace;
+  color:#9df4ae;
+  overflow:hidden
+}
+.terminal-prompt{color:#4b8560}
+.code-text{text-shadow:0 0 10px rgba(107,255,148,.08)}
+.code-caret{display:inline-block;width:.62em;height:1.08em;background:#f34c28;vertical-align:-.14em;animation:terminal-blink .85s steps(1,end) infinite}
+.terminal-status{
+  height:36px;
+  display:grid;
+  grid-template-columns:auto 1fr auto;
+  gap:14px;
+  align-items:center;
+  font-size:9px;
+  letter-spacing:.07em;
+  color:#5a8a64
+}
+.terminal-progress{height:2px;background:#1d3423;overflow:hidden}
+.terminal-progress i{display:block;height:100%;width:0;background:#78e58d;box-shadow:0 0 8px #78e58d}
+
+/* Foreground content on terminal remains legible without changing layout. */
+#cs .section-head>p,#cs .project-rows p,#cs .research-heading p,#cs .research-papers p{color:#aeb9ae!important}
+#cs .section-head,#cs .subhead,#cs .project-rows,#cs .projects,#cs .research-feature,#cs .cs-stack{position:relative;z-index:2}
+#cs .cs-stack article,#cs .research-feature,#cs .project-image,#cs .project-rows article{
+  background:rgba(10,15,11,.88)!important;
+  color:#eef5ed!important;
+  border-color:rgba(235,245,235,.32)!important;
+  backdrop-filter:blur(9px)
+}
+#cs .cs-stack article:first-child{background:rgba(237,245,237,.93)!important;color:#0c120e!important}
+#cs .research-feature{background:rgba(18,31,21,.91)!important}
+#cs .project-image>span:nth-child(2),#cs .project-image.second>span:nth-child(2){color:#697b6b}
+#cs .text-link{border-color:#dce8dc;color:#eef5ed}
+
+/* ------------------------------------------------------------------
+   FINANCE: JNJ line develops as the page scrolls, with larger swings.
+------------------------------------------------------------------ */
+#finance{background:#e9ece6}
+.finance-parallax{
+  background:
+    radial-gradient(circle at 78% 18%,rgba(255,255,255,.74),transparent 35%),
+    linear-gradient(#e9ece6,#dfe5dd)
+}
+.jnj-board{
+  position:sticky;
+  top:var(--site-header-height);
+  height:calc(100vh - var(--site-header-height));
+  min-height:620px;
+  padding:6vh 3.5vw 5vh 31%;
+  color:#1b241d
+}
+.jnj-heading{
+  display:flex;
+  align-items:baseline;
+  gap:14px;
+  border-bottom:1px solid rgba(27,36,29,.28);
+  padding-bottom:10px;
+  text-transform:uppercase
+}
+.jnj-heading strong{font:900 clamp(2rem,4vw,4.4rem)/1 Arial,sans-serif;letter-spacing:-.08em}
+.jnj-heading span{font:10px 'Courier New',monospace;letter-spacing:.06em;color:#566159}
+.jnj-heading span:last-child{margin-left:auto}
+.jnj-board svg{width:100%;height:68%;margin-top:3vh;overflow:visible}
+.jnj-grid line{stroke:rgba(35,49,39,.13);stroke-width:1;vector-effect:non-scaling-stroke}
+.jnj-grid text{fill:#69736c;font:11px 'Courier New',monospace}
+.jnj-candles{overflow:visible}
+.jnj-candle{opacity:0;transform-box:fill-box;transform-origin:center bottom;transform:translateY(8px) scaleY(.82);transition:opacity .12s linear,transform .12s linear}
+.jnj-candle .wick{stroke-width:1.45;vector-effect:non-scaling-stroke}
+.jnj-candle .body{rx:1.5;ry:1.5}
+.jnj-candle.up .wick{stroke:#17845a}
+.jnj-candle.up .body{fill:#21a56f;stroke:#13734d;stroke-width:1}
+.jnj-candle.down .wick{stroke:#bc483c}
+.jnj-candle.down .body{fill:#d95a4c;stroke:#a23b31;stroke-width:1}
+.jnj-volume{opacity:0;transform-box:fill-box;transform-origin:center bottom;transform:scaleY(.18);transition:opacity .12s linear,transform .12s linear}
+.jnj-volume.up{fill:rgba(33,165,111,.28)}
+.jnj-volume.down{fill:rgba(217,90,76,.27)}
+.jnj-ma{fill:none;stroke:#3e526f;stroke-width:1.4;stroke-dasharray:4 6;opacity:.34;vector-effect:non-scaling-stroke}
+.jnj-cursor{fill:#f1c44a;stroke:#f8faf7;stroke-width:2;opacity:0;filter:drop-shadow(0 2px 5px rgba(0,0,0,.16))}
+.jnj-price-tag{opacity:0}
+.jnj-price-tag rect{fill:#171714}
+.jnj-price-tag text{fill:#f7f7f2;font:10px 'Courier New',monospace}
+.jnj-axis{display:flex;justify-content:space-between;font:9px 'Courier New',monospace;letter-spacing:.06em;color:#657168;border-top:1px solid rgba(27,36,29,.22);padding-top:8px}
+
+/* Let foreground finance cards sit above the chart while preserving layout. */
+#finance .results,#finance .market-panel,#finance .wharton,#finance .markov-panel,#finance .sim-panel,#finance .current-work{
+  position:relative;z-index:2
+}
+#finance .market-panel,#finance .wharton,#finance .markov-panel,#finance .sim-panel{
+  backdrop-filter:blur(8px)
+}
+
+/* Achievement accents remain strong. */
+.timeline-node.timeline-highlight .achievement-score{background:linear-gradient(135deg,#c79c2a,#efd478);color:#171714;padding:16px 18px;border:1px solid #a27d1b!important;box-shadow:0 12px 28px rgba(133,98,15,.16)}
+.results .result-accent{box-shadow:0 14px 34px rgba(243,76,40,.16)}
+.qualification{background:#f34c28;color:#171714;border:0!important}
+.wharton{position:relative}.wharton:before{content:'LEADERSHIP / SEMIFINALIST';position:absolute;right:0;top:-22px;background:#f34c28;padding:8px 11px;font:11px 'Courier New',monospace;letter-spacing:.05em}
+
+
+/* Future timeline ambition: intentionally distinct from completed achievements. */
+.timeline-node.timeline-future{
+  background:rgba(247,247,242,.66);
+  border-style:dashed!important;
+  box-shadow:none!important
+}
+.timeline-node.timeline-future:after{background:#f7f7f2;border-color:#7b7b72}
+.timeline-node.timeline-future .future-kicker{color:#77776f}
+.timeline-node.timeline-future .future-score{
+  min-width:108px;
+  padding:13px 14px;
+  border:1px dashed #77776f;
+  text-align:left;
+  background:rgba(255,255,255,.22)
+}
+.timeline-node.timeline-future .future-score>span{display:block;margin:0 0 4px;font:10px 'Courier New',monospace;letter-spacing:.08em}
+.timeline-node.timeline-future .future-score>b{display:block;margin:0;font-size:1.35rem;letter-spacing:-.04em}
+.timeline-node.timeline-future .future-score>small{display:block;margin-top:7px;font:9px/1.25 'Courier New',monospace;letter-spacing:.035em;color:#6f6f68}
+
+.current-work-main{max-width:760px}
+.current-work-main p{margin-top:14px;color:#55554e;font-size:.94rem;line-height:1.65;max-width:72ch}
+#finance .current-work-main p{color:#4e5a50}
+
+/* Later chapters return to a calmer opaque surface. */
+#experience,#academics{background:#f4f1e9}
+
+html[data-theme="dark"] body{
+  background-color:#171711;
+  background-image:
+    linear-gradient(90deg,transparent 0 11.5%,rgba(185,86,66,.14) 11.5% 11.65%,transparent 11.65%),
+    repeating-linear-gradient(0deg,transparent 0 30px,rgba(142,167,142,.08) 30px 31px),
+    linear-gradient(#171711,#11130f)
+}
+html[data-theme="dark"] .journal-sheet{background-color:#171711;background-image:linear-gradient(90deg,transparent 0 12%,rgba(192,89,67,.15) 12% 12.15%,transparent 12.15%),repeating-linear-gradient(0deg,transparent 0 29px,rgba(148,170,148,.08) 29px 30px),radial-gradient(circle at 72% 28%,rgba(255,255,255,.025),transparent 36%)}
+html[data-theme="dark"] .journal-meta{color:rgba(242,242,234,.35)}
+html[data-theme="dark"] .geo-ink{stroke:#c9d0c5}
+html[data-theme="dark"] .circle-main{stroke:#aeb8ad}
+html[data-theme="dark"] .circle-third,html[data-theme="dark"] .chord-line{stroke:#ef795c}
+html[data-theme="dark"] .tangent{stroke:#e3e9df}
+html[data-theme="dark"] .radical-axis,html[data-theme="dark"] .construction{stroke:#89988c}
+html[data-theme="dark"] .geo-point circle{fill:#e1e8df}
+html[data-theme="dark"] .geo-point text,html[data-theme="dark"] .geo-label{fill:#dce4da}
+html[data-theme="dark"] .accent-point circle,html[data-theme="dark"] .accent-point text{fill:#ef795c}
+html[data-theme="dark"] .journal-note{color:rgba(232,184,143,.54)}
+html[data-theme="dark"] #finance{background:#101610}
+html[data-theme="dark"] .finance-parallax{background:radial-gradient(circle at 78% 18%,rgba(255,255,255,.035),transparent 35%),linear-gradient(#101610,#0b110c)}
+html[data-theme="dark"] .jnj-board{color:#dbe7dc}
+html[data-theme="dark"] .jnj-heading{border-color:rgba(219,231,220,.22)}
+html[data-theme="dark"] .jnj-heading span,html[data-theme="dark"] .jnj-axis{color:#859588}
+html[data-theme="dark"] .jnj-grid line{stroke:rgba(219,231,220,.11)}
+html[data-theme="dark"] .jnj-grid text{fill:#78877b}
+html[data-theme="dark"] .jnj-candle.up .wick{stroke:#68d9a3}
+html[data-theme="dark"] .jnj-candle.up .body{fill:#36b97d;stroke:#67d3a0}
+html[data-theme="dark"] .jnj-candle.down .wick{stroke:#ef8a7e}
+html[data-theme="dark"] .jnj-candle.down .body{fill:#d96559;stroke:#f18b80}
+html[data-theme="dark"] .jnj-ma{stroke:#9db8df;opacity:.3}
+html[data-theme="dark"] .jnj-volume.up{fill:rgba(71,192,130,.24)}
+html[data-theme="dark"] .jnj-volume.down{fill:rgba(222,105,92,.23)}
+html[data-theme="dark"] #experience,html[data-theme="dark"] #academics{background:#111210}
+
+
+
+html[data-theme="dark"] .timeline-node.timeline-future{background:rgba(24,26,22,.62)!important}
+html[data-theme="dark"] .timeline-node.timeline-future:after{background:#111210;border-color:#8b8f84}
+html[data-theme="dark"] .timeline-node.timeline-future .future-kicker,
+html[data-theme="dark"] .timeline-node.timeline-future .future-score>small{color:#a5aa9f}
+html[data-theme="dark"] .timeline-node.timeline-future .future-score{background:rgba(255,255,255,.025);border-color:#858b80!important}
+html[data-theme="dark"] #finance .current-work-main p{color:#aeb8ad}
+
+@media(max-width:1000px){
+  .aime-geometry{width:86vw;right:-12%;opacity:.38}
+  .terminal-screen{padding-left:26%}
+  .jnj-board{padding-left:23%}
+}
+
+@media(max-width:700px){
+  .journal-sheet,.terminal-screen,.jnj-board{top:var(--site-header-height);min-height:560px}
+  .aime-geometry{width:118vw;right:-38%;top:7%;height:85%;opacity:.26}
+  .journal-meta{right:5%;font-size:8px}.journal-note{display:none}
+  .terminal-screen{padding:5vh 4vw 5vh 12%;opacity:.72}
+  .terminal-bar{grid-template-columns:1fr auto}.terminal-bar>span:nth-child(2){display:none}
+  .terminal-body pre{font-size:10px;padding:15px 14px}.terminal-gutter{font-size:9px}
+  .terminal-status{grid-template-columns:1fr 1.4fr}.terminal-status>span:last-child{display:none}
+  .jnj-board{padding:7vh 4vw 5vh 8%;opacity:.62}.jnj-heading span:nth-child(2){display:none}.jnj-heading span:last-child{font-size:7px}.jnj-board svg{height:63%}
+  .jnj-axis span:nth-child(2){display:none}
+  .wharton:before{position:static;display:inline-block;margin-bottom:14px}
+}
+
+@media(prefers-reduced-motion:reduce){
+  .code-caret{animation:none}
+  .geo-draw,.jnj-candle,.jnj-volume{transition:none!important}
+}
+
+/* Sticky background fix: the section-sized layer must not become a scroll container. */
+.math-parallax,.cs-parallax,.finance-parallax{overflow:visible}
+
+/* Let the terminal read as an actual persistent background instead of a hidden panel. */
+#cs .cs-stack article,#cs .research-feature,#cs .project-image,#cs .project-rows article{
+  background:rgba(10,15,11,.76)!important;
+  backdrop-filter:blur(7px)
+}
+#cs .cs-stack article:first-child{background:rgba(237,245,237,.90)!important}
+.terminal-screen{opacity:.92}
+
+/* Keep the JNJ study visible behind the existing finance layout. */
+.jnj-board{opacity:.78}
+#finance .market-panel{background:rgba(247,248,244,.84)!important}
+#finance .markov-panel,#finance .sim-panel{background:rgba(232,235,223,.86)!important}
+#finance .results article{background:rgba(247,248,244,.84)}
+#finance .results .result-accent{background:#f34c28!important}
+html[data-theme="dark"] #finance .market-panel{background:rgba(15,20,15,.84)!important}
+html[data-theme="dark"] #finance .markov-panel,html[data-theme="dark"] #finance .sim-panel{background:rgba(25,31,23,.88)!important}
+html[data-theme="dark"] #finance .results article{background:rgba(15,20,15,.86)}
+html[data-theme="dark"] #finance .results .result-accent{background:var(--accent)!important}

@@ -238,9 +238,9 @@
   let ticking = false;
   function draw() {
     ticking = false;
-    const mp = math ? progress(math) : 0;
-    const cp = cs ? progress(cs) : 0;
-    const fp = finance ? progress(finance) : 0;
+    const mp = reduced.matches ? 1 : math ? progress(math) : 0;
+    const cp = reduced.matches ? 1 : cs ? progress(cs) : 0;
+    const fp = reduced.matches ? 1 : finance ? progress(finance) : 0;
 
     updateGeometry(mp);
 

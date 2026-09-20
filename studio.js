@@ -1,96 +1,48 @@
 (() => {
-  'use strict';
-  const $ = id => document.getElementById(id);
-  const reduced = matchMedia('(prefers-reduced-motion: reduce)');
-  const dark = () => document.documentElement.dataset.theme === 'dark';
-  const colors = () => ({ink:dark()?'#e9eee3':'#263d35', grid:dark()?'#67816c':'#a1b596', accent:dark()?'#efa28b':'#b74e36'});
-  function canvasSize(canvas) {
-    const box=canvas.getBoundingClientRect(), dpr=Math.min(devicePixelRatio||1,2);
-    canvas.width=Math.round(box.width*dpr);canvas.height=Math.round(box.height*dpr);
-    const ctx=canvas.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);
-    return {ctx,w:box.width,h:box.height};
-  }
-  function rotate(x,y,z,a,b) {
-    const X=x*Math.cos(a)+z*Math.sin(a), Z=-x*Math.sin(a)+z*Math.cos(a);
-    return [X,y*Math.cos(b)-Z*Math.sin(b),y*Math.sin(b)+Z*Math.cos(b)];
-  }
-  // Real 3D torus geometry, projected onto a lightweight 2D canvas.
-  const sculpture=$('sculpture');let hero=canvasSize(sculpture), angle=.4, visible=true, paused=reduced.matches, frame=0, last=0;
-  function drawSculpture(){
-    const {ctx:c,w,h}=hero;if(!w||!h)return;c.clearRect(0,0,w,h);
-    const scale=w*.255, cx=w*.50, cy=h*.49;
-    const project=p=>{const q=rotate(...p,angle,.64);const depth=4/(4-q[2]);return [cx+q[0]*scale*depth,cy+q[1]*scale*depth,q[2]];};
-    const shadow=c.createRadialGradient(cx,h*.79,0,cx,h*.79,w*.29);shadow.addColorStop(0,'#243b2520');shadow.addColorStop(1,'#243b2500');c.fillStyle=shadow;c.save();c.translate(0,h*.60);c.scale(1,.25);c.fillRect(0,0,w,h);c.restore();
-    const faces=[],U=72,V=24;
-    const p=(u,v)=>[(1+.34*Math.cos(v))*Math.cos(u),(1+.34*Math.cos(v))*Math.sin(u),.34*Math.sin(v)];
-    for(let i=0;i<U;i++)for(let j=0;j<V;j++){
-      const u=i/U*Math.PI*2,v=j/V*Math.PI*2;
-      const points=[p(u,v),p(u+2*Math.PI/U,v),p(u+2*Math.PI/U,v+2*Math.PI/V),p(u,v+2*Math.PI/V)].map(project);
-      const normal=rotate(Math.cos(v)*Math.cos(u),Math.cos(v)*Math.sin(u),Math.sin(v),angle,.64);
-      const light=Math.max(0,normal[0]*-.35+normal[1]*-.5+normal[2]*.78);
-      faces.push({points,z:points.reduce((a,p)=>a+p[2],0)/4,light});
-    }
-    faces.sort((a,b)=>a.z-b.z).forEach(f=>{c.beginPath();f.points.forEach((p,i)=>i?c.lineTo(p[0],p[1]):c.moveTo(p[0],p[1]));c.closePath();c.fillStyle=`hsl(86 23% ${dark()?24+f.light*35:48+f.light*30}%)`;c.fill();c.strokeStyle=`hsla(88, 25%, ${dark()?65:30}%, .17)`;c.lineWidth=.55;c.stroke();});
-    function ball(x,y,r,a,b){const g=c.createRadialGradient(x-r*.35,y-r*.45,r*.05,x,y,r);g.addColorStop(0,a);g.addColorStop(1,b);c.fillStyle=g;c.beginPath();c.arc(x,y,r,0,Math.PI*2);c.fill();}
-    ball(w*.78,h*.29,w*.087,'#f4cbb0','#b76548');ball(w*.21,h*.70,w*.046,'#f4e9c0','#b6a36b');
-    c.strokeStyle=colors().grid;c.lineWidth=.8;c.beginPath();c.ellipse(cx,cy,w*.42,h*.18,-.42,0,Math.PI*2);c.stroke();
-    const t=angle*1.4;ball(cx+Math.cos(t)*w*.38,cy+Math.sin(t)*h*.20,w*.012,'#eed2b7','#ad6d48');
-  }
-  function loop(t){frame=0;if(!visible||paused||document.hidden)return;if(t-last>32){angle+=.004;drawSculpture();last=t;}frame=requestAnimationFrame(loop);}
-  function startHero(){if(!frame&&visible&&!paused&&!document.hidden)frame=requestAnimationFrame(loop);}
-  function syncMotion(){paused=reduced.matches;$('orbit-toggle').setAttribute('aria-pressed',String(paused));$('orbit-toggle').textContent=paused?'Resume motion ▷':'Pause motion Ⅱ';if(paused){cancelAnimationFrame(frame);frame=0;}else startHero();}
-  $('orbit-toggle').addEventListener('click',()=>{paused=!paused;$('orbit-toggle').setAttribute('aria-pressed',String(paused));$('orbit-toggle').textContent=paused?'Resume motion ▷':'Pause motion Ⅱ';if(paused){cancelAnimationFrame(frame);frame=0;}else startHero();});
-  new IntersectionObserver(entries=>{visible=entries[0].isIntersecting;if(visible)startHero();else{cancelAnimationFrame(frame);frame=0;}}).observe(sculpture);
-  reduced.addEventListener('change',syncMotion);
-  new ResizeObserver(()=>{hero=canvasSize(sculpture);drawSculpture();}).observe(sculpture);syncMotion();drawSculpture();
-
-  // Convex quadratic: gradient exactly (x, 3y), minimum exactly (0, 0).
-  const canvas=$('gradient-canvas');let scene=canvasSize(canvas), yaw=-.65, tilt=.85;
-  let x=2.8,y=2.0, steps=0, path=[[x,y]], timer=null, terminal=false;
-  const loss=(a,b)=>.5*a*a+1.5*b*b;
-  let viewScale=1,viewX=0,viewY=0;
-  function project(a,b,z){const q=rotate(a,-z*.20,b,yaw,tilt);return [viewX+q[0]*viewScale,viewY+q[1]*viewScale,q[2]];}
-  function line(points,color,width=1){const c=scene.ctx;c.beginPath();points.forEach((p,i)=>i?c.lineTo(p[0],p[1]):c.moveTo(p[0],p[1]));c.strokeStyle=color;c.lineWidth=width;c.stroke();}
-  function draw(){
-    const {ctx:c,w,h}=scene;if(!w||!h)return;c.clearRect(0,0,w,h);const palette=colors(),faces=[],N=22,R=3.2;
-    const bounds=[];
-    for(let i=0;i<=N;i++)for(let j=0;j<=N;j++){const a=-R+i*2*R/N,b=-R+j*2*R/N;bounds.push(rotate(a,-loss(a,b)*.20,b,yaw,tilt));}
-    const minX=Math.min(...bounds.map(p=>p[0])),maxX=Math.max(...bounds.map(p=>p[0])),minY=Math.min(...bounds.map(p=>p[1])),maxY=Math.max(...bounds.map(p=>p[1]));
-    viewScale=Math.min((w-42)/(maxX-minX),(h-36)/(maxY-minY));viewX=w/2-(minX+maxX)/2*viewScale;viewY=h/2-(minY+maxY)/2*viewScale;
-    for(let i=0;i<N;i++)for(let j=0;j<N;j++){
-      const a=-R+i*2*R/N,b=-R+j*2*R/N,d=2*R/N;
-      const pts=[[a,b],[a+d,b],[a+d,b+d],[a,b+d]].map(([a,b])=>project(a,b,loss(a,b)));
-      faces.push({pts,z:pts.reduce((sum,p)=>sum+p[2],0)/4,l:loss(a+d/2,b+d/2)});
-    }
-    faces.sort((a,b)=>a.z-b.z).forEach(f=>{c.beginPath();f.pts.forEach((p,i)=>i?c.lineTo(p[0],p[1]):c.moveTo(p[0],p[1]));c.closePath();c.fillStyle=`hsla(95,${dark()?18:24}%,${dark()?29+f.l*.4:82-f.l*.6}%,.78)`;c.fill();c.strokeStyle=dark()?'#9caf8740':'#6a896c40';c.lineWidth=.6;c.stroke();});
-    const origin=project(0,0,0);c.strokeStyle=palette.ink;c.lineWidth=1.5;c.beginPath();c.ellipse(origin[0],origin[1],8,4,0,0,Math.PI*2);c.stroke();
-    line(path.filter(([a,b])=>Math.abs(a)<=4&&Math.abs(b)<=4).map(([a,b])=>project(a,b,loss(a,b))),palette.accent,2.5);
-    if(Math.abs(x)<=4&&Math.abs(y)<=4){const dot=project(x,y,loss(x,y));c.beginPath();c.arc(dot[0],dot[1],7,0,Math.PI*2);c.fillStyle=palette.accent;c.fill();c.strokeStyle=dark()?'#203229':'#fffef9';c.lineWidth=2;c.stroke();}
-    c.font='11px monospace';c.fillStyle=palette.ink;c.fillText('minimum',origin[0]+13,origin[1]+15);
-  }
-  function status(text){$('gd-status').textContent=text;}
-  function update(){ $('gd-steps').textContent=steps;$('gd-loss').textContent=loss(x,y).toFixed(4);draw(); }
-  function stop(){clearInterval(timer);timer=null;$('gd-run').textContent=terminal?'Restart descent ↘':'Start descent ↘';}
-  function step(){if(terminal)return;const rate=Number($('learning-rate').value);x-=rate*x;y-=rate*3*y;steps++;path.push([x,y]);
-    if(!Number.isFinite(loss(x,y))||Math.abs(x)>3.7||Math.abs(y)>3.7){terminal=true;stop();status('Off the surface! The steps are too large. Lower the learning rate and restart.');}
-    else if(loss(x,y)<.00001){terminal=true;stop();status('Found it. Tiny steps, a satisfying finish. The loss is now below 0.00001.');}
-    else if(steps>=600){terminal=true;stop();status('Stopped at 600 steps. Try a different learning rate or a new starting point.');}
-    else status(rate>2/3?'These steps overshoot. Watch the loss grow.':rate>.33?'A little zigzag, but still heading toward the minimum.':'Heading downhill. Each step brings the loss closer to zero.');
-    update();
-  }
-  function reset(random=true){terminal=false;stop();steps=0;x=random?(1.4+Math.random()*1.5)*(Math.random()<.5?-1:1):2.8;y=random?(1.2+Math.random()*.9)*(Math.random()<.5?-1:1):2;path=[[x,y]];status('Fresh start. Where will your next step take you?');update();}
-  $('gd-run').addEventListener('click',()=>{if(timer){stop();status('Paused. Take a look around, or continue downhill.');return;}if(terminal)reset(false);$('gd-run').textContent='Pause Ⅱ';timer=setInterval(step,180);});
-  $('gd-step').addEventListener('click',()=>{stop();if(terminal)reset(false);step();});
-  $('gd-reset').addEventListener('click',()=>reset());
-  $('learning-rate').addEventListener('input',()=>{$('learning-rate-value').textContent=Number($('learning-rate').value).toFixed(2);if(terminal)reset(false);});
-  $('rotate-surface').addEventListener('click',()=>{yaw+=Math.PI/6;draw();});
-  let drag=null;
-  canvas.addEventListener('pointerdown',e=>{drag={x:e.clientX,y:e.clientY,yaw,tilt};canvas.setPointerCapture(e.pointerId);});
-  canvas.addEventListener('pointermove',e=>{if(!drag)return;yaw=drag.yaw+(e.clientX-drag.x)*.008;tilt=Math.max(.35,Math.min(1.2,drag.tilt+(e.clientY-drag.y)*.003));draw();});
-  ['pointerup','pointercancel','lostpointercapture'].forEach(type=>canvas.addEventListener(type,()=>drag=null));
-  new ResizeObserver(()=>{scene=canvasSize(canvas);draw();}).observe(canvas);
-  new IntersectionObserver(entries=>{if(!entries[0].isIntersecting&&timer){stop();status('Paused while you explore. Continue whenever you’re ready.');}}).observe($('gradient-lab'));
-  document.addEventListener('visibilitychange',()=>{if(document.hidden){cancelAnimationFrame(frame);frame=0;if(timer){stop();status('Paused. Continue whenever you’re ready.');}}else startHero();});
-  window.addEventListener('themechange',()=>{draw();drawSculpture();});
-  update();
+'use strict';
+const $=id=>document.getElementById(id), reduced=matchMedia('(prefers-reduced-motion: reduce)');
+const nodes=[
+['club',0,0,'Grade 7','The first math team','Selected for the middle-school math competition club.'],
+['amc8',0,1,'Grade 8','AMC 8 · 17','The beginning of a competition-math foundation.'],
+['amc10',0,2,'Grades 9–10','AMC 10 → AIME','From an AMC 10 score of 72 in grade 9 to 99 and AIME qualification in grade 10.'],
+['amc12',0,3,'Grade 11','AMC 12 · 123 / AIME · 8','Competition preparation developed creative reasoning and persistence.','major'],
+['study',0,4,'Independent study','Beyond the syllabus','Linear algebra, discrete mathematics, real analysis and calculus, supported by the books on this site.'],
+['sumac',0,5,'Summer study','Stanford SUMaC','Track I: abstract algebra. Advanced study builds on competition mathematics.'],
+['usamo',0,6,'Future goal','USAMO qualification','An ambition for grade 12; not yet achieved.','future'],
+['java',1,0,'Grade 9','Learning Java','School coursework introduced programming and algorithmic problem solving.'],
+['python',1,1,'Grade 10','Java → Python','Applied programming skills to machine learning and severe-weather prediction.'],
+['weather',1,2,'Project','Severe weather AI','Weather prediction project and Presidential AI Challenge participation.'],
+['cac',1,3,'Congressional App Challenge','Weather, made visible','The weather project extended into an interactive app. See the live project and its map above.','major'],
+['scrape',1,4,'Summer after grade 10','Small tools, useful answers','Grade scraping, Google Sheets analysis and social-post research.'],
+['usaco',1,5,'Algorithms','USACO Silver','Logical and creative thinking from mathematics carries into programming.'],
+['quant',1,6,'Currently building','A healthcare quant pipeline','An ensemble of models exploring healthcare, biomedical and pharmaceutical stocks.'],
+['unt',2,2,'Research internship','University of North Texas','Machine learning and biology research, building on programming and mathematical reasoning.'],
+['papers',2,3,'Computational epidemiology','Dataset → analysis → action','Three research strands: a documented dataset, disease-spread analysis and recommendations for public action.'],
+['txsef',2,4,'Texas Science & Engineering Fair','1st place · TXSEF','Category winner in computational epidemiology.','major'],
+['upenn',2,5,'Research','UPenn · Game theory','Research connecting mathematical thinking with strategic decisions.'],
+['deca10',3,1,'Grade 10','DECA · 33 / 1,700+','First Stock Market Game season developed experience with markets and team decisions.'],
+['deca11',3,2,'Grade 11','DECA · 12 / 1,600+','A subsequent season brought ICDC qualification and reported portfolio growth of 114%.'],
+['icdc',3,3,'International competition','DECA ICDC · 14 / 100','Stock Market Game team finish at ICDC.','major'],
+['wharton',3,4,'Wharton Global Youth','Wharton semifinalist','Team leadership, client-focused risk constraints, research and quantitative strategy.','major'],
+['models',3,5,'Research & risk','Models meet judgment','Markov chains, hidden Markov models, Monte Carlo, Granger analysis and XGBoost inform research.']
+];
+const edges=[['club','amc8'],['amc8','amc10'],['amc10','amc12'],['amc12','study'],['study','sumac'],['amc12','usamo'],['java','python'],['python','weather'],['weather','cac'],['java','scrape'],['amc12','usaco'],['java','usaco'],['amc10','unt'],['weather','unt'],['unt','papers'],['papers','txsef'],['unt','upenn'],['amc12','upenn'],['study','upenn'],['deca10','deca11'],['deca11','icdc'],['deca11','wharton'],['scrape','wharton'],['amc12','wharton'],['wharton','models'],['models','quant'],['scrape','quant'],['papers','quant'],['upenn','quant']];
+const wrap=$('journey-nodes'),svg=$('journey-edges');
+nodes.forEach(([id,col,row,era,title,desc,type])=>{const b=document.createElement('button');b.type='button';b.className='journey-node '+(type||'');b.id='j-'+id;b.style.left=(col*275+24)+'px';b.style.top=(row*137+80)+'px';b.innerHTML=`<span>${era}</span><strong>${title}</strong><small>${type==='future'?'Future ambition':type==='major'?'Selected achievement':'Explore connections'} ↗</small>`;b.setAttribute('aria-pressed','false');b.addEventListener('click',()=>select(id));wrap.appendChild(b);});
+const ns='http://www.w3.org/2000/svg';
+edges.forEach(([a,b])=>{const n=nodes.find(n=>n[0]===a),m=nodes.find(n=>n[0]===b),p=document.createElementNS(ns,'path');let x=n[1]*275+139,y=n[2]*137+179,X=m[1]*275+139,Y=m[2]*137+80;
+if(n[1]!==m[1]){x=n[1]*275+(m[1]>n[1]?254:24);X=m[1]*275+(m[1]>n[1]?24:254);y=n[2]*137+130;Y=m[2]*137+130;}
+p.setAttribute('d',`M ${x} ${y} C ${x} ${(y+Y)/2}, ${X} ${(y+Y)/2}, ${X} ${Y}`);p.dataset.a=a;p.dataset.b=b;if(m[6]==='future')p.classList.add('future');svg.appendChild(p);});
+function select(id){const linked=new Set([id]);edges.forEach(([a,b])=>{if(a===id)linked.add(b);if(b===id)linked.add(a);});nodes.forEach(n=>{const e=$('j-'+n[0]);e.classList.toggle('dim',!linked.has(n[0]));e.classList.toggle('selected',n[0]===id);e.setAttribute('aria-pressed',String(n[0]===id));});svg.querySelectorAll('path').forEach(p=>{const active=p.dataset.a===id||p.dataset.b===id;p.classList.toggle('active',active);p.classList.toggle('dim',!active);});const n=nodes.find(n=>n[0]===id);$('journey-detail').textContent=n[4]+' — '+n[5];}
+$('journey-reset').onclick=()=>{wrap.querySelectorAll('button').forEach(n=>{n.classList.remove('dim','selected');n.setAttribute('aria-pressed','false');});svg.querySelectorAll('path').forEach(p=>p.classList.remove('dim','active'));$('journey-detail').textContent='Select any milestone. Solid lines connect experiences; dashed lines lead to future goals.';};
+// A projected parametric knot: one continuous thread, many connections.
+const canvas=$('sculpture'),ctx=canvas.getContext('2d');let angle=.3,paused=reduced.matches,visible=true,frame=0;
+function draw(){const w=canvas.clientWidth,h=canvas.clientHeight,dpr=Math.min(devicePixelRatio||1,2);canvas.width=w*dpr;canvas.height=h*dpr;ctx.scale(dpr,dpr);const dark=document.documentElement.dataset.theme==='dark';ctx.clearRect(0,0,w,h);const points=[];for(let i=0;i<=420;i++){const t=i/420*Math.PI*2,x=(2+Math.cos(3*t))*Math.cos(2*t),y=(2+Math.cos(3*t))*Math.sin(2*t),z=Math.sin(3*t),X=x*Math.cos(angle)-z*Math.sin(angle),Z=x*Math.sin(angle)+z*Math.cos(angle);points.push([w/2+X*w*.115,h/2+(y*.72+Z*.5)*w*.115,Z]);}
+for(let i=1;i<points.length;i++){const a=points[i-1],b=points[i];ctx.beginPath();ctx.moveTo(a[0],a[1]);ctx.lineTo(b[0],b[1]);ctx.strokeStyle=`hsla(${155+(b[2]+3)*9},${dark?35:27}%,${dark?62:33}%,${.35+(b[2]+3)/9})`;ctx.lineWidth=2.5+(b[2]+3)*.65;ctx.stroke();}
+for(let i=0;i<points.length;i+=35){const a=points[i];ctx.beginPath();ctx.arc(a[0],a[1],4,0,Math.PI*2);ctx.fillStyle=dark?'#efa28b':'#b74e36';ctx.fill();}
+}
+function loop(){frame=0;if(paused||!visible||document.hidden)return;angle+=.003;draw();frame=requestAnimationFrame(loop);}
+function start(){if(!frame&&!paused&&visible&&!document.hidden)frame=requestAnimationFrame(loop);}
+function sync(){const b=$('orbit-toggle');b.textContent=paused?'Resume motion ▷':'Pause motion Ⅱ';b.setAttribute('aria-pressed',String(paused));if(paused){cancelAnimationFrame(frame);frame=0;}else start();}
+$('orbit-toggle').onclick=()=>{paused=!paused;sync();};reduced.addEventListener('change',()=>{paused=reduced.matches;sync();});new ResizeObserver(draw).observe(canvas);new IntersectionObserver(e=>{visible=e[0].isIntersecting;if(visible)start();}).observe(canvas);document.addEventListener('visibilitychange',start);window.addEventListener('themechange',draw);draw();sync();
 })();

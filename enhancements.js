@@ -23,8 +23,8 @@ themeChoices.forEach(button=>button.addEventListener('click',()=>applyTheme(butt
 const bookCovers=[
   {
     urls:[
-      'https://covers.openlibrary.org/b/isbn/9780977304561-L.jpg',
-      'https://covers.openlibrary.org/b/isbn/9780977304585-L.jpg'
+      'assets/9780977304561-L.jpg',
+      'assets/9780977304585-L.jpg'
     ],
     alts:['The Art of Problem Solving, Volume 1 cover','The Art of Problem Solving, Volume 2 cover'],
     titles:['AoPS Volume 1','AoPS Volume 2'],
@@ -32,35 +32,35 @@ const bookCovers=[
     edition:'Volumes 1 & 2 · 7th edition covers'
   },
   {
-    urls:['https://covers.openlibrary.org/b/isbn/9781934124048-L.jpg'],
+    urls:['assets/9781934124048-L.jpg'],
     alts:['Intermediate Algebra by Richard Rusczyk and Mathew Crawford book cover'],
     titles:['Intermediate Algebra'],
     backups:['https://books.google.com/books/content?id=vNmNngEACAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api'],
     edition:'AoPS · Richard Rusczyk & Mathew Crawford'
   },
   {
-    urls:['https://covers.openlibrary.org/b/isbn/9781934124062-L.jpg'],
+    urls:['assets/9781934124062-L.jpg'],
     alts:['Intermediate Counting & Probability by David Patrick book cover'],
     titles:['Intermediate Counting & Probability'],
     backups:[null],
     edition:'AoPS · David Patrick'
   },
   {
-    urls:['https://covers.openlibrary.org/b/isbn/9780070856134-L.jpg'],
+    urls:['assets/9780070856134-L.jpg'],
     alts:['Principles of Mathematical Analysis by Walter Rudin, third edition book cover'],
     titles:['Principles of Mathematical Analysis'],
     backups:['https://books.google.com/books/content?id=kwqzPAAACAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api'],
     edition:'Walter Rudin · 3rd edition'
   },
   {
-    urls:['https://covers.openlibrary.org/b/isbn/9781305480513-L.jpg'],
+    urls:['assets/9781305480513-L.jpg'],
     alts:['Calculus by James Stewart, eighth edition book cover'],
     titles:['Calculus'],
     backups:['https://books.google.com/books/content?id=spiaBAAAQBAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api'],
     edition:'James Stewart · 8th edition'
   },
   {
-    urls:['https://covers.openlibrary.org/b/isbn/9780135851258-L.jpg'],
+    urls:['assets/9780135851258-L.jpg'],
     alts:['Linear Algebra and Its Applications by Lay, Lay and McDonald, sixth edition book cover'],
     titles:['Linear Algebra and Its Applications'],
     backups:['https://books.google.com/books/content?id=3eY3EAAAQBAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api'],

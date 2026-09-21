@@ -15,4 +15,4 @@ Dark mode and reduced-motion support remain. USAMO is marked as a future goal.
 The package now includes `robots.txt`, `sitemap.xml`, `llms.txt`, `site.webmanifest`, a crawlable favicon, a social preview image, canonical/Open Graph/Twitter metadata, and JSON-LD `WebSite` + `ProfilePage` + `Person` structured data. The canonical URL is currently `https://akhil-malladi-paralax-portfolio.onrender.com/`. If the production domain changes, update that URL in `index.html`, `robots.txt`, `sitemap.xml`, and `llms.txt` before deployment.
 
 After deployment, submit `https://akhil-malladi-paralax-portfolio.onrender.com/sitemap.xml` in Google Search Console and Bing Webmaster Tools, then request indexing for the home page. Validate the deployed page with Google Rich Results Test and URL Inspection.
-The Journey section uses a radial network that expands to a full-screen focus view on interaction, keeps every milestone visible without overlap, and retains the legend and milestone descriptor on the left.
+
